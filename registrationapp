@@ -1,0 +1,124 @@
+javacode
+
+
+package com.example.registrationapp;
+
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class MainActivity extends AppCompatActivity {
+
+    EditText etName, etEmail, etPassword;
+    Button btnRegister;
+    TextView tvWelcome;
+
+    public static final String SHARED_PREFS = "userPrefs";
+    public static final String NAME_KEY = "name";
+    public static final String EMAIL_KEY = "email";
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        etName = findViewById(R.id.etName);
+        etEmail = findViewById(R.id.etEmail);
+        etPassword = findViewById(R.id.etPassword);
+        btnRegister = findViewById(R.id.btnRegister);
+        tvWelcome = findViewById(R.id.tvWelcome);
+
+        // Check if user already registered, show welcome if yes
+        SharedPreferences sharedPreferences = getSharedPreferences(SHARED_PREFS, Context.MODE_PRIVATE);
+        String savedName = sharedPreferences.getString(NAME_KEY, null);
+        if (savedName != null) {
+            showWelcome(savedName);
+        }
+
+        btnRegister.setOnClickListener(v -> {
+            String name = etName.getText().toString().trim();
+            String email = etEmail.getText().toString().trim();
+            String password = etPassword.getText().toString().trim();
+
+            if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
+                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(NAME_KEY, name);
+            editor.putString(EMAIL_KEY, email);
+            editor.apply();
+
+            showWelcome(name);
+        });
+    }
+
+    private void showWelcome(String name) {
+        etName.setVisibility(View.GONE);
+        etEmail.setVisibility(View.GONE);
+        etPassword.setVisibility(View.GONE);
+        btnRegister.setVisibility(View.GONE);
+
+        tvWelcome.setText("Welcome, " + name + "!");
+        tvWelcome.setVisibility(View.VISIBLE);
+    }
+}
+
+
+xml code
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:gravity="center_horizontal">
+
+    <EditText
+        android:id="@+id/etName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Name" />
+
+    <EditText
+        android:id="@+id/etEmail"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Email"
+        android:inputType="textEmailAddress" />
+
+    <EditText
+        android:id="@+id/etPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Enter Password"
+        android:inputType="textPassword" />
+
+    <Button
+        android:id="@+id/btnRegister"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Register"
+        android:layout_marginTop="20dp" />
+
+    <!-- Hidden initially, shows after registration -->
+    <TextView
+        android:id="@+id/tvWelcome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="24sp"
+        android:textColor="#000000"
+        android:layout_marginTop="40dp"
+        android:visibility="gone" />
+
+</LinearLayout>
+
